@@ -15,48 +15,48 @@ const createProduct = async function (req, res) {
         //------------------------------------- Distructuring------------------------------//
         const { title, description, price, currencyId, currencyFormat,
             style, availableSizes, installments } = data
-         //----------------------------------- All validation------------------------------//
-         if (!isValidRequestBody(data)) {
-             return res.status(400).send({ status: false, msg: "please provide the Details" })
-         }
-         //    --------------------------Title validation----------------------------------//
-         if (!isValid(title)) {
-             return res.status(400).send({ status: false, msg: "please enter the title" })
-         }
-         if (!nameRegex.test(title))
-             return res.status(400).send({ status: false, message: "title should contain alphabets only." })
-         const checktitle = await productModel.findOne({ title: title })
-         if (checktitle)
-             return res.status(400).send({ status: false, msg: "title is already present" })
-         // -------------------------------Description validation--------------------------//
-         if (!isValid(description)) {
-             return res.status(400).send({ status: false, msg: "please enter the description" })
-            }
+        //----------------------------------- All validation------------------------------//
+        if (!isValidRequestBody(data)) {
+            return res.status(400).send({ status: false, msg: "please provide the Details" })
+        }
+        //    --------------------------Title validation----------------------------------//
+        if (!isValid(title)) {
+            return res.status(400).send({ status: false, msg: "please enter the title" })
+        }
+        if (!nameRegex.test(title))
+            return res.status(400).send({ status: false, message: "title should contain alphabets only." })
+        const checktitle = await productModel.findOne({ title: title })
+        if (checktitle)
+            return res.status(400).send({ status: false, msg: "title is already present" })
+        // -------------------------------Description validation--------------------------//
+        if (!isValid(description)) {
+            return res.status(400).send({ status: false, msg: "please enter the description" })
+        }
         // -------------------------------Price validation---------------------------------//
-            if (!isValid(price)) {
-                return res.status(400).send({ status: false, msg: "please enter price" })
-            }
-            if (!numRegex.test(price)) {
-                return res.status(400).send({ status: false, msg: "please provide numerical price" })
-            }
+        if (!isValid(price)) {
+            return res.status(400).send({ status: false, msg: "please enter price" })
+        }
+        if (!numRegex.test(price)) {
+            return res.status(400).send({ status: false, msg: "please provide numerical price" })
+        }
         // -------------------------------currencyId validation----------------------------------//
-            if (!isValid(currencyId)) {
-                return res.status(400).send({ status: false, msg: "please provide currencyId" })
-            }
-            if (currencyId != "INR") {
-                return res.status(400).send({ status: false, msg: "please provide valid currencyId" })
-            }
+        if (!isValid(currencyId)) {
+            return res.status(400).send({ status: false, msg: "please provide currencyId" })
+        }
+        if (currencyId != "INR") {
+            return res.status(400).send({ status: false, msg: "please provide valid currencyId" })
+        }
         // -------------------------------currencyFormat validation-----------------------------//
-            if (!currencyFormat) {
-                return res.status(400).send({ status: false, msg: "please provide currencyFormet" })
-            }
-            if (currencyFormat !== "₹") {
-                return res.status(400).send({ status: false, msg: 'currencyFormat should be "₹" ' })
-            }
+        if (!currencyFormat) {
+            return res.status(400).send({ status: false, msg: "please provide currencyFormet" })
+        }
+        if (currencyFormat !== "₹") {
+            return res.status(400).send({ status: false, msg: 'currencyFormat should be "₹" ' })
+        }
         // -------------------------------style validation---------------------------------------//
-            let bodyFromReq = JSON.parse(JSON.stringify(data));
-            if (bodyFromReq.hasOwnProperty("style"))
-                if (!isValid(style)) return res.status(400).send({ status: false, Message: "Please provide style field", })
+        let bodyFromReq = JSON.parse(JSON.stringify(data));
+        if (bodyFromReq.hasOwnProperty("style"))
+            if (!isValid(style)) return res.status(400).send({ status: false, Message: "Please provide style field", })
         // -------------------------------availableSizes validation-----------------------------//
         if (!availableSizes) {
             return res.status(400).send({ status: false, msg: "please provide availableSizes" })
@@ -75,17 +75,17 @@ const createProduct = async function (req, res) {
         }
         data['availableSizes'] = sizeArr
         // -------------------------------installments validation-----------------------------//
-        if ((installments ||installments==="")){
+        if ((installments || installments === "")) {
             if (!isValid(installments))
                 return res.status(400).send({ status: false, Message: "Please provide installments" })
-        if (!numRegex.test(installments)) {
-            return res.status(400).send({ status: false, msg: "please provide installement only numercial value" })
+            if (!numRegex.test(installments)) {
+                return res.status(400).send({ status: false, msg: "please provide installement only numercial value" })
+            }
         }
-    }
         // -------------------------------files validation------------------------------------//
-        
+
         let url = await uploadFile(files[0])
-        data['productImage'] = url 
+        data['productImage'] = url
         const product = await productModel.create(data)
         return res.status(201).send({ status: true, message: "product create successfully", data: product })
     } catch (error) {
@@ -96,12 +96,12 @@ const createProduct = async function (req, res) {
 
 const getProduct = async function (req, res) {
     try {
-        const  data = req.query;
-        let { size, name, priceGreaterThan, priceLessThan,priceSort} = data
+        const data = req.query;
+        let { size, name, priceGreaterThan, priceLessThan, priceSort } = data
         const obj = { isDeleted: false }
 
         let checkQueryParams = Object.keys(data)
-        let arr = ["priceGreaterThan", "priceLessThan", "name", "size","priceSort"]
+        let arr = ["priceGreaterThan", "priceLessThan", "name", "size", "priceSort"]
         for (let i = 0; i < checkQueryParams.length; i++) {
             let update = arr.includes(checkQueryParams[i])
             if (!update) {
@@ -111,7 +111,8 @@ const getProduct = async function (req, res) {
         const availableSizes = size
         if (availableSizes) {
             let newSize = size.split(",").map((ele) => ele.trim())
-            obj.availableSizes = {$in:newSize}
+            console.log(newSize)
+            obj.availableSizes = { $in: newSize }
         }
         if (size !== undefined) {
             if (!isValid(size)) {
@@ -119,7 +120,7 @@ const getProduct = async function (req, res) {
             }
         }
         let title = name
-        if (title) obj.title = { $regex: name, $options: "i" }
+        if (title) obj.title = { $regex: name }
         if (name !== undefined) {
             if (!isValid(name)) {
                 return res.status(400).send({ status: false, message: "please enter proper name" })
@@ -137,42 +138,45 @@ const getProduct = async function (req, res) {
         }
         if (priceGreaterThan !== undefined) {
             if (!isValid(priceGreaterThan)) {
-                return res.status(400).send({ status: false, message: "please enter proper maximum price" })}
-        
-        if (isNaN(priceGreaterThan)) {
-            return res.status(400).send({ status: false, message: "please enter proper maximum price" }) }
-    }
+                return res.status(400).send({ status: false, message: "please enter proper maximum price" })
+            }
+
+            if (isNaN(priceGreaterThan)) {
+                return res.status(400).send({ status: false, message: "please enter proper maximum price" })
+            }
+        }
         if (priceLessThan !== undefined) {
             if (!isValid(priceLessThan)) {
-                return res.status(400).send({ status: false, message: "please enter proper minimum price" })}
-        if (isNaN(priceLessThan)) {
-            return res.status(400).send({ status: false, message: "please enter proper minimum price" })
+                return res.status(400).send({ status: false, message: "please enter proper minimum price" })
+            }
+            if (isNaN(priceLessThan)) {
+                return res.status(400).send({ status: false, message: "please enter proper minimum price" })
+            }
         }
-    }
         if (priceSort !== undefined) {
             if (!["1", "-1"].includes(priceSort)) {
                 return res.status(400).
-                send({ status: false, message: "please enter the price sort value for ascending order gives 1 or for descending order gives " })
+                    send({ status: false, message: "please enter the price sort value for ascending order gives 1 or for descending order gives " })
             }
         }
         if (priceSort) {
             price = priceSort
             let priceDetails = await productModel.find(obj).sort({ price: price })
             if (priceDetails.length === 0) {
-            return res.status(400).send({ status:false, message: "no product found for the given query" })
+                return res.status(400).send({ status: false, message: "no product found for the given query" })
             }
             return res.status(200).send({ status: true, message: "success", data: priceDetails })
         }
 
         if (priceGreaterThan || priceLessThan) {
             let priceDetails = await productModel.find(obj).sort({ price: 1 })
-            if (priceDetails.length ===0)
-                return res.status(400).send({ status:false, message: "no product found for the given query" })
+            if (priceDetails.length === 0)
+                return res.status(400).send({ status: false, message: "no product found for the given query" })
             return res.status(200).send({ status: true, message: "success", data: priceDetails })
         }
         let priceDetails = await productModel.find(obj)
         if (priceDetails.length === 0)
-            return res.status(400).send({ status:false, message: "no product found for the given query" })
+            return res.status(400).send({ status: false, message: "no product found for the given query" })
 
         return res.status(200).send({ status: true, message: "success", data: priceDetails })
     } catch (err) {
@@ -290,8 +294,8 @@ const updateProduct = async function (req, res) {
                 return res.status(400).send({ status: false, msg: " please Provide the style " })
         newObj["style"] = style
         //------------------------------------Installments validation---------------------------------//
-        if (installments ||installments==="") {
-                if (!isValid(installments)) return res.status(400).send({ status: false, Message: "Please provide installments" })
+        if (installments || installments === "") {
+            if (!isValid(installments)) return res.status(400).send({ status: false, Message: "Please provide installments" })
             if (!numRegex.test(installments)) {
                 return res.status(400).send({ status: false, msg: "please provide installement only numercial value" })
             }

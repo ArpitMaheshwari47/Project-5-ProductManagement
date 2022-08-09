@@ -27,7 +27,7 @@ const registerUser = async (req, res) => {
     if (!nameRegex.test(fname))    // --> name should be provided in right format
       return res.status(400).send({ status: false, message: "fname should contain alphabets only." })
 
-    //--------------------------fname validation----------------------------//
+    //--------------------------lname validation----------------------------//
 
     if (!isValid(lname))   // --> lname should be provided in the body
       return res.status(400).send({ status: false, message: "Please enter the lname." })

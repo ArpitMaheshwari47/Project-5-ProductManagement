@@ -85,7 +85,7 @@ const createCart = async function (req, res) {
                     totalPrice: product.price + cart.totalPrice,
                     totalItems: cart.totalItems + 1
                 }
-                updateCart = await cartModel.findOneAndUpdate({ userId: userId }, newCart, { new: true }).populate([{ path: "items.productId" }])
+                updateCart = await cartModel.findOneAndUpdate({ userId: userId }, newCart, { new: true })
             }
         }
         return res.status(201).send({ status: true, message: "Success", data: updateCart })
@@ -225,30 +225,25 @@ const getCart = async function (req, res) {
 
 const deleteCart = async function (req, res) {
     try {
-
-        let userId = req.params.userId
-        if (!isValidObjectId(userId)) {
-            return res.status(400).send({ status: false, message: "Please provide a valid userId" })
-        }
-
-        // authorization part-------//
-        if (userId !== req.userId) {
-            return res.status(403).send({ status: false, message: "You are not authorized for this cart" })//=> check authorization
-        }
-        let checkUser = await userModel.findOne({ _id: userId })
-        if (!checkUser) {
-            return res.status(404).send({ status: false, message: "This User is Not Exist" })
-        }
-        let existCart = await cartModel.findOneAndUpdate({ userId: userId }, { items: [], totalItems: 0, totalPrice: 0 }, { new: true })
-        if (!existCart) {
-            return res.status(404).send({ status: false, message: "Cart is not exist for this user" })
-        }
-        if (existCart.items.length === 0) return res.status(400).send({ status: false, msg: "Cart is already empty" })
-        return res.status(204).send({ status: true, message: "success", data: existCart })
+      let userId = req.params.userId;
+  
+      if (!isValidObjectId(userId)) {
+        return res.status(400).send({ status: false, message: "Please provide a correct userId" })
+      }
+      if (userId !== req.userId) {
+        return res.status(403).send({ status: false, message: "You are not authorized for delete this particuler cart" })
+      }
+      const existCart = await cartModel.findOneAndUpdate({ userId: userId }, { items: [], totalItems: 0, totalPrice: 0 }, { new: true })
+      if (!existCart) {
+        return res.status(404).send({ status: false, message: "Cart is not exist for this user" })
+      }
+      return res.status(204).send({ status: true, message: "Success", data: existCart })
+  
     } catch (error) {
-        return res.status(500).send({ status: false, message: error.message })
+      return res.status(500).send({ status: false, message: error.message })
+  
     }
-}
+  }
 module.exports = { createCart, updatedCart, getCart, deleteCart }
 
 
